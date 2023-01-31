@@ -1,0 +1,1 @@
+docker build -t control -f Dockerfile --build-arg UID=$(id -u) --build-arg GID=$(id -g) --build-arg UNAME=$(whoami) .
