@@ -42,8 +42,8 @@ double PID::TotalError() {
    * TODO: Calculate and return the total error
     * The code should return a value in the interval [output_lim_mini, output_lim_maxi]
    */
-   const double delta = dt_ < 1E-4 ? 0.0 : ((curr_cte_ - last_cte_) / dt_);
-   const double control = -(param_p_ + param_i_ * sum_cte_ + param_d_ * delta);
+   const double delta = dt_ < 1E-8 ? 0.0 : ((curr_cte_ - last_cte_) / dt_);
+   const double control = -(param_p_ * curr_cte_ + param_i_ * sum_cte_ + param_d_ * delta);
    return std::max(std::min(control, max_), min_);
 }
 
@@ -51,6 +51,6 @@ double PID::UpdateDeltaTime(double new_delta_time) {
    /**
    * TODO: Update the delta time with new value
    */
-   dt_ =  = new_delta_time;
+   dt_ =  new_delta_time;
    return dt_;
 }
