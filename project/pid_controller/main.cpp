@@ -228,8 +228,8 @@ int main ()
   PID pid_steer = PID();
   PID pid_throttle = PID();
   // Init(double Kpi, double Kii, double Kdi, double output_lim_maxi, double output_lim_mini)
-  pid_steer.Init(0.2, 0.001, 0.1, 1.2, -1.2);
-  pid_throttle.Init(0.2, 0.0001, 0.002, 1.0, -1.0);
+  pid_steer.Init(0.3, 0.00001, 0.2, 1.2, -1.2);
+  pid_throttle.Init(0.2, 0.001, 0.02, 1.0, -1.0);
 
   h.onMessage([&pid_steer, &pid_throttle, &new_delta_time, &timer, &prev_timer, &i, &prev_timer](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode)
   {
@@ -307,17 +307,8 @@ int main ()
           // if the trajectory only has one point, the directory to that point is the target.
           if (x_points.size() > 1U)
           {
-            std::vector<double> yaws;
-            yaws.reserve(x_points.size() - 1U);
-            for (size_t i = 1; i < x_points.size(); ++i)
-            {
-              yaws.push_back(std::atan2(
-                y_points[i] - y_points[i - 1U],
-                x_points[i] - x_points[i - 1U]
-              ));
-            }
-            const double ey = std::accumulate(yaws.begin(), yaws.end(), 0.0) / static_cast<double>(yaws.size());
-            error_steer = ey - yaw;
+            error_steer = angle_between_points(x_position, y_position, x_points.back(), y_points.back()) - yaw;
+            error_steer = -error_steer;
           }
           else if(x_points.size() == 1U)
           {
@@ -367,6 +358,7 @@ int main ()
           // v_points[-1] should be the expected velocity and the difference is the error.
           double expected_velocity = v_points.back();
           error_throttle = velocity - expected_velocity;
+          // error_throttle = -error_throttle;
 
           double throttle_output;
           double brake_output;
